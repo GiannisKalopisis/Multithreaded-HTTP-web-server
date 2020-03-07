@@ -1,4 +1,4 @@
-# Multithreaded-TCP-web-server
+# Multithreaded-HTTP-web-server
 A multithreaded HTTP Client/Server and a web crawler.
 
 
