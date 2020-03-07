@@ -45,7 +45,7 @@ When it receives such a request, the server assigns it to one of the threads in 
 
 The server works with the threads as follows: the server accepts a connection to the socket and places the corresponding file descriptor in a buffer from which the threads are read. Each thread is responsible for a file descriptor from which to read the GET request and return the response, that is the content of the web page (or a different response as below if the file does not exist or does not have the appropriate permissions thread).
 
-An indicative request from the browser to the server is: `http://127.0.0.1:5050/site0/page0_8552.html`.
+An indicative request from the browser to the server is: `http://127.0.0.1:8080/site0/page0_8552.html`.
 
 ### File exists
 If ***the requested file exists***, and the server is allowed to read it, then a format response is returned (the length is in bytes only for the size of the content, ie without the header):
@@ -92,8 +92,8 @@ Connection: Closed
 ### Server Commands
 At the command port, the server listens to and receives the following simple commands (1 word each) that are executed directly by the server without having to be assigned a thread:
 
-  - **STATS**: the server responds by how long it runs, how many pages it has returned, and the total number of bytes (ie `http://127.0.0.1:5050/STATS`).
-  - **SHUTDOWN**: The server stops serving additional requests, releases any memory (shared or not) it has allocated, and stops executing (ie `http://127.0.0.1:5050/SHUTDOWN`).
+  - **STATS**: the server responds by how long it runs, how many pages it has returned, and the total number of bytes (ie `http://127.0.0.1:8080/STATS`).
+  - **SHUTDOWN**: The server stops serving additional requests, releases any memory (shared or not) it has allocated, and stops executing (ie `http://127.0.0.1:8080/SHUTDOWN`).
 
 
 ## Web Crawler
@@ -111,6 +111,10 @@ where:
   - **save_dir**: is the directory in which the crawler will save the downloaded pages. Essentially after the crawler runs (and if all server pages are accessible with a link) save_dir should be an exact copy of root_dir.
   - **starting_URL**: is the URL from which the crawler starts
   
+An example of running crawler is:
+```
+./mycrawler -h 127.0.0.1 -p 8080 -c 7070 -t 5 -d save_dir http://localhost:8080/site0/page0_777.html  
+```  
   
 ### Crawler Workflow
 The crawler works as follows:
@@ -128,11 +132,14 @@ At the command port the crawler listens and receives the following simple comman
   - **SEARCH** word1 word2 word3 ... word10: crawler returns the number of words that are requested (ie `http://127.0.0.1:9000/SEARCH/word1/word2/.../word10`). If the crawler still has pages in the queue then it returns a message indicating that the crawling is in-progress. If the crawler has finished downloading all web pages, then this command returns the search results over the socket. More specifically it runs the job executor code inside the crawler with the appropriate parameters for the files, and executes the search command and returns the result over the socket for the given query. Workers start only once. HTML tags are ignored when searching/indexing. 
   - **SHUTDOWN**: The crawler stops asking for additional pages, releases any memory (shared or not) it has cached, and stops executing it (ie `http://127.0.0.1:9000/SHUTDOWN`).
   
+## Telnet
+Command requests can be sent via Telnet, by typing: `telnet localhost command_port`. Connection closes after sending a request.
+  
 ## Compile
 You can type:
   - `make` to compile all the code for this project
-  - `cleanAll` to delete all .o files, logs and pipes
-  - `clean/cleanLogFile/cleanPipes` to delete the above files respectively
+  - `make cleanAll` to delete all .o files, logs and pipes
+  - `make clean/cleanLogFile/cleanPipes` to delete the above files respectively
 
 
 
